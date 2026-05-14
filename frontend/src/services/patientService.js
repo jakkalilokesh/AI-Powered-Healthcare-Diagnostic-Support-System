@@ -2,7 +2,7 @@ import api from './api'
 
 export const patientService = {
   getPatients: async (params = {}) => {
-    const response = await api.get('/patients', { params })
+    const response = await api.get('/patients/', { params })
     return response.data
   },
 
@@ -12,7 +12,7 @@ export const patientService = {
   },
 
   createPatient: async (patientData) => {
-    const response = await api.post('/patients', patientData)
+    const response = await api.post('/patients/', patientData)
     return response.data
   },
 
