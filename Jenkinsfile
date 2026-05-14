@@ -155,23 +155,30 @@ pipeline {
         }
 
         stage('Wait for MySQL') {
-            steps {
-                sh '''
-                    echo "Waiting for MySQL..."
+    steps {
+        sh '''
+            echo "Waiting for MySQL..."
 
-                    for i in {1..20}; do
-                        if docker exec ${MYSQL_CONTAINER} mysqladmin ping -h localhost --silent; then
-                            echo "MySQL ready."
-                            exit 0
-                        fi
-                        sleep 5
-                    done
+            ATTEMPTS=20
+            COUNT=0
 
+            until docker exec ${MYSQL_CONTAINER} mysqladmin ping -uroot -p${DB_PASS} --silent; do
+                COUNT=$((COUNT+1))
+
+                if [ "$COUNT" -ge "$ATTEMPTS" ]; then
                     echo "MySQL startup timeout."
+                    docker logs ${MYSQL_CONTAINER}
                     exit 1
-                '''
-            }
-        }
+                fi
+
+                echo "MySQL not ready yet... attempt $COUNT/$ATTEMPTS"
+                sleep 10
+            done
+
+            echo "MySQL is ready."
+        '''
+    }
+}
 
         stage('Deploy Backend') {
             steps {
