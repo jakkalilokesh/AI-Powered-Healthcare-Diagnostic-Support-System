@@ -36,29 +36,33 @@ pipeline {
         }
 
         stage('Backend Install & Validation') {
-            steps {
-                dir('backend') {
-                    sh '''
-                        rm -rf venv
-                        python3 -m venv venv
-                        . venv/bin/activate
+    steps {
+        dir('backend') {
+            sh '''
+                rm -rf venv
+                python3 -m venv venv
+                . venv/bin/activate
 
-                        pip install --upgrade pip
-                        pip install -r requirements.txt
-                        pip install pytest
+                pip install --upgrade pip
+                pip install -r requirements.txt
+                pip install pytest
 
-                        TEST_COUNT=$(find . -type f \\( -name "test_*.py" -o -name "*_test.py" \\) | wc -l)
+                TEST_COUNT=$(find . \
+                  -path "./venv" -prune -o \
+                  -type f \\( -name "test_*.py" -o -name "*_test.py" \\) \
+                  -print | wc -l)
 
-                        if [ "$TEST_COUNT" -gt 0 ]; then
-                            echo "Running backend tests..."
-                            pytest
-                        else
-                            echo "No backend tests found. Skipping pytest."
-                        fi
-                    '''
-                }
-            }
+                echo "Detected test files: $TEST_COUNT"
+
+                if [ "$TEST_COUNT" -gt 0 ]; then
+                    pytest
+                else
+                    echo "No backend tests found. Skipping pytest."
+                fi
+            '''
         }
+    }
+}
 
         stage('Frontend Install & Build') {
             steps {
