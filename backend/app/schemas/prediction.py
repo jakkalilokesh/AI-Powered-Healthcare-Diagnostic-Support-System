@@ -6,7 +6,7 @@ from typing import Optional, Dict, Any
 class PredictionBase(BaseModel):
     risk_probability: float = Field(..., ge=0.0, le=1.0)
     confidence_score: float = Field(..., ge=0.0, le=1.0)
-    risk_level: str = Field(..., regex="^(low|moderate|high|very_high)$")
+    risk_level: str = Field(..., pattern="^(low|moderate|high|very_high)$")
     contributing_factors: Dict[str, float]
     notes: Optional[str] = None
 
@@ -14,6 +14,10 @@ class PredictionBase(BaseModel):
 class PredictionCreate(PredictionBase):
     patient_id: int
     vitals_id: int
+
+
+class PredictionUpdate(BaseModel):
+    notes: Optional[str] = None
 
 
 class PredictionInDB(PredictionBase):

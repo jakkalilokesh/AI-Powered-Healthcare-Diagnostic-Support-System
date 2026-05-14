@@ -18,3 +18,4 @@ class Prediction(Base):
     notes = Column(Text)
 
     patient = relationship("Patient", back_populates="predictions")
+    vitals = relationship("Vitals", back_populates="predictions")

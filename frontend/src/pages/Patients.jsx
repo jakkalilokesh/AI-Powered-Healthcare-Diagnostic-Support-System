@@ -9,7 +9,8 @@ import {
   Plus, 
   MoreVertical,
   Edit,
-  Trash2
+  Trash2,
+  Users
 } from 'lucide-react'
 
 const Patients = () => {

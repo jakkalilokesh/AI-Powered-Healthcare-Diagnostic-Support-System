@@ -26,3 +26,4 @@ class Vitals(Base):
     notes = Column(String(500))
     
     patient = relationship("Patient", back_populates="vitals")
+    predictions = relationship("Prediction", back_populates="vitals", cascade="all, delete-orphan")

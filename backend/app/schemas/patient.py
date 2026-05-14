@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field
 from datetime import datetime
 from typing import Optional
 
@@ -7,7 +7,7 @@ class PatientBase(BaseModel):
     first_name: str = Field(..., min_length=2, max_length=100)
     last_name: str = Field(..., min_length=2, max_length=100)
     date_of_birth: datetime
-    gender: str = Field(..., regex="^(male|female|other)$")
+    gender: str = Field(..., pattern="^(male|female|other)$")
     phone: Optional[str] = Field(None, max_length=20)
     email: Optional[str] = None
     address: Optional[str] = None
@@ -23,7 +23,7 @@ class PatientUpdate(BaseModel):
     first_name: Optional[str] = Field(None, min_length=2, max_length=100)
     last_name: Optional[str] = Field(None, min_length=2, max_length=100)
     date_of_birth: Optional[datetime] = None
-    gender: Optional[str] = Field(None, regex="^(male|female|other)$")
+    gender: Optional[str] = Field(None, pattern="^(male|female|other)$")
     phone: Optional[str] = Field(None, max_length=20)
     email: Optional[str] = None
     address: Optional[str] = None

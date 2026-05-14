@@ -191,6 +191,17 @@ pipeline {
                       --network ${NETWORK_NAME} \
                       -p 8000:8000 \
                       -e DATABASE_URL=mysql+pymysql://${DB_USER}:${DB_PASS}@${MYSQL_CONTAINER}:3306/${DB_NAME} \
+                      -e JWT_SECRET_KEY=223bb87d03b76918f2fec1d7a22fcc3666a82457d9b760194f1b6ff22c51802c \
+                      -e JWT_ALGORITHM=HS256 \
+                      -e ACCESS_TOKEN_EXPIRE_MINUTES=15 \
+                      -e REFRESH_TOKEN_EXPIRE_DAYS=7 \
+                      -e BCRYPT_ROUNDS=12 \
+                      -e CSRF_SECRET_KEY=b112248c3e67493ed3bb45b8683c5694fb042f27a7eef5f9a09e7fb7a95f0adc \
+                      -e CORS_ORIGINS=http://localhost:5173,http://localhost:3000,http://localhost \
+                      -e RATE_LIMIT_PER_MINUTE=60 \
+                      -e ENVIRONMENT=production \
+                      -e DEBUG=false \
+                      -e FRONTEND_URL=http://localhost \
                       ${DOCKER_HUB_REPO}/${BACKEND_IMAGE}:latest
                 '''
             }

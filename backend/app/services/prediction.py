@@ -24,15 +24,21 @@ class PredictionService:
         patient_service = PatientService(self.db)
         patient = patient_service.get_patient(patient_id, user_id)
         
+        # Build vitals data — extract only the vitals fields (exclude patient_id from request)
+        vitals_fields = [
+            'age', 'sex', 'cp', 'trestbps', 'chol', 'fbs',
+            'restecg', 'thalach', 'exang', 'oldpeak', 'slope', 'ca', 'thal'
+        ]
+        request_data = prediction_request.model_dump()
+        vitals_data = {k: request_data[k] for k in vitals_fields}
+        
         # Create vitals record
-        vitals_data = prediction_request.model_dump()
-        vitals_data["patient_id"] = patient_id
-        vitals = Vitals(**vitals_data)
+        vitals = Vitals(patient_id=patient_id, **vitals_data)
         self.db.add(vitals)
         self.db.commit()
         self.db.refresh(vitals)
         
-        # Get ML prediction
+        # Get ML prediction — pass only the clean vitals data (no patient_id)
         from app.ml.predictor import HeartDiseasePredictor
         predictor = HeartDiseasePredictor()
         result = predictor.predict(vitals_data)

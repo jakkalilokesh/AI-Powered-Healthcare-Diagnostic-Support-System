@@ -1,4 +1,4 @@
-import { Outlet, Link, useLocation } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { useUIStore, useAuthStore } from '../store'
 import { motion, AnimatePresence } from 'framer-motion'
 import { 
@@ -12,7 +12,7 @@ import {
   Home
 } from 'lucide-react'
 
-const Layout = () => {
+const Layout = ({ children }) => {
   const { sidebarOpen, toggleSidebar } = useUIStore()
   const { user, logout } = useAuthStore()
   const location = useLocation()
@@ -117,7 +117,7 @@ const Layout = () => {
 
         {/* Page Content */}
         <main className="p-4">
-          <Outlet />
+          {children}
         </main>
       </div>
     </div>

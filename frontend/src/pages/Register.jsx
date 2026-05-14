@@ -27,6 +27,8 @@ const Register = () => {
     try {
       setLoading(true)
       await authService.register(formData)
+      // Registration doesn't set auth cookies, so login after register
+      await authService.login(formData.username, formData.password)
       const user = await authService.getCurrentUser()
       setUser(user)
       navigate('/')
