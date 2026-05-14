@@ -1,41 +1,80 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   body {
-    @apply bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 min-h-screen;
+    @apply bg-[#0f172a] text-slate-200 min-h-screen font-outfit antialiased;
+    background: radial-gradient(circle at top right, #1e293b, #0f172a);
+    background-attachment: fixed;
+  }
+
+  /* Custom Scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-white/10 rounded-full hover:bg-white/20 transition-colors;
   }
 }
 
 @layer components {
   .glass-card {
-    @apply bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl shadow-xl;
+    @apply bg-white/[0.03] backdrop-blur-xl border border-white/[0.08] rounded-2xl shadow-2xl;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .glass-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
   }
   
   .glass-input {
-    @apply bg-white/5 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all;
+    @apply bg-white/[0.03] border border-white/[0.1] rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all duration-300;
   }
   
   .glass-button {
-    @apply bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-semibold px-6 py-3 rounded-lg hover:from-blue-600 hover:to-cyan-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105;
+    @apply bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-semibold px-6 py-3 rounded-xl hover:from-blue-700 hover:to-cyan-600 transition-all duration-300 shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 transform hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none;
   }
   
   .glass-button-secondary {
-    @apply bg-white/10 border border-white/20 text-white font-semibold px-6 py-3 rounded-lg hover:bg-white/20 transition-all duration-300;
+    @apply bg-white/[0.05] border border-white/[0.1] text-white font-semibold px-6 py-3 rounded-xl hover:bg-white/[0.1] transition-all duration-300 backdrop-blur-md;
   }
   
-  .skeleton {
-    @apply animate-pulse bg-white/10 rounded;
+  .nav-link-active {
+    @apply bg-gradient-to-r from-blue-600 to-cyan-500 text-white shadow-lg shadow-blue-500/20;
+  }
+
+  .animate-pulse-slow {
+    animation: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 0.2; transform: scale(1); }
+    50% { opacity: 0.3; transform: scale(1.1); }
   }
 }
 
 @layer utilities {
-  .text-shadow {
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  .text-glow {
+    text-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
   }
   
   .glass-shadow {
-    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
   }
 }

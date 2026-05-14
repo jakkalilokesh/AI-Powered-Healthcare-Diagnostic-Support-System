@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { useQuery } from '@tanstack/react-query'
 import Layout from '../components/Layout'
+import AddPatientModal from '../components/AddPatientModal'
 import { patientService } from '../services'
 import { usePatientStore } from '../store'
 import { 
@@ -15,6 +16,7 @@ import {
 
 const Patients = () => {
   const [searchQuery, setSearchQuery] = useState('')
+  const [isModalOpen, setIsModalOpen] = useState(false)
   const { patients, setPatients, removePatient } = usePatientStore()
 
   const { data: patientsData, isLoading, refetch } = useQuery({
@@ -51,7 +53,10 @@ const Patients = () => {
             <h1 className="text-3xl font-bold text-white mb-2">Patients</h1>
             <p className="text-white/70">Manage your patient records</p>
           </div>
-          <button className="glass-button flex items-center gap-2">
+          <button 
+            onClick={() => setIsModalOpen(true)}
+            className="glass-button flex items-center gap-2"
+          >
             <Plus size={20} />
             Add Patient
           </button>
@@ -132,13 +137,22 @@ const Patients = () => {
                 <Users className="text-white/50" size={32} />
               </div>
               <p className="text-white/50 mb-4">No patients found</p>
-              <button className="glass-button">
+              <button 
+                onClick={() => setIsModalOpen(true)}
+                className="glass-button"
+              >
                 <Plus size={20} className="mr-2" />
                 Add Your First Patient
               </button>
             </div>
           )}
         </div>
+
+        <AddPatientModal 
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          onSuccess={() => refetch()}
+        />
       </motion.div>
     </Layout>
   )

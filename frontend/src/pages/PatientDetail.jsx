@@ -1,4 +1,4 @@
-import { useParams } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useQuery } from '@tanstack/react-query'
 import Layout from '../components/Layout'
@@ -14,6 +14,7 @@ import {
 
 const PatientDetail = () => {
   const { id } = useParams()
+  const navigate = useNavigate()
 
   const { data: patient, isLoading: patientLoading } = useQuery({
     queryKey: ['patient', id],
@@ -49,8 +50,11 @@ const PatientDetail = () => {
         className="space-y-6"
       >
         {/* Back Button */}
-        <button className="flex items-center gap-2 text-white/70 hover:text-white transition-colors">
-          <ArrowLeft size={20} />
+        <button 
+          onClick={() => navigate('/patients')}
+          className="flex items-center gap-2 text-white/70 hover:text-white transition-colors group"
+        >
+          <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
           Back to Patients
         </button>
 

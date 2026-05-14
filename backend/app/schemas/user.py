@@ -52,3 +52,7 @@ class TokenPayload(BaseModel):
     sub: int
     exp: int
     type: str
+
+
+class RefreshTokenRequest(BaseModel):
+    refresh_token: str

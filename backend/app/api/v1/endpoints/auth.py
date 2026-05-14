@@ -3,7 +3,7 @@ from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.core.security import verify_access_token, verify_refresh_token
-from app.schemas.user import UserCreate, UserLogin, Token, User
+from app.schemas.user import UserCreate, UserLogin, Token, User, RefreshTokenRequest
 from app.services.auth import AuthService
 from app.core.config import settings
 
@@ -85,20 +85,31 @@ def logout(response: Response):
     return {"message": "Successfully logged out"}
 
 
+
 @router.post("/refresh", response_model=Token)
 def refresh_token(
     request: Request,
     response: Response,
+    refresh_in: Optional[RefreshTokenRequest] = None,
     db: Session = Depends(get_db)
 ):
-    refresh_token_cookie = request.cookies.get("refresh_token")
-    if not refresh_token_cookie:
+    refresh_token_val = None
+    
+    # Try body first (frontend's new preference)
+    if refresh_in:
+        refresh_token_val = refresh_in.refresh_token
+    
+    # Fallback to cookie
+    if not refresh_token_val:
+        refresh_token_val = request.cookies.get("refresh_token")
+        
+    if not refresh_token_val:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Refresh token not found"
         )
     
-    payload = verify_refresh_token(refresh_token_cookie)
+    payload = verify_refresh_token(refresh_token_val)
     if not payload:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -109,7 +120,7 @@ def refresh_token(
     auth_service = AuthService(db)
     token = auth_service.refresh_token(user_id)
     
-    # Set new HTTP-only cookies
+    # Still set cookies as a backup/for other clients
     response.set_cookie(
         key="access_token",
         value=token.access_token,

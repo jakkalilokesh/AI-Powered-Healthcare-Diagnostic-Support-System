@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useQuery } from '@tanstack/react-query'
 import Layout from '../components/Layout'
@@ -13,6 +14,7 @@ import {
 } from 'lucide-react'
 
 const Dashboard = () => {
+  const navigate = useNavigate()
   const { setPatients } = usePatientStore()
 
   const { data: patientsData, isLoading } = useQuery({
@@ -70,20 +72,25 @@ const Dashboard = () => {
           {stats.map((stat, index) => {
             const Icon = stat.icon
             return (
-              <motion.div
+              <Link
                 key={stat.label}
-                variants={itemVariants}
-                whileHover={{ scale: 1.05 }}
-                className="glass-card p-6"
+                to={stat.label === 'Total Patients' ? '/patients' : '#'}
+                className="block"
               >
-                <div className="flex items-center justify-between mb-4">
-                  <div className={`p-3 bg-gradient-to-r ${stat.color} rounded-lg`}>
-                    <Icon className="text-white" size={24} />
+                <motion.div
+                  variants={itemVariants}
+                  whileHover={{ scale: 1.05 }}
+                  className="glass-card p-6 h-full"
+                >
+                  <div className="flex items-center justify-between mb-4">
+                    <div className={`p-3 bg-gradient-to-r ${stat.color} rounded-lg`}>
+                      <Icon className="text-white" size={24} />
+                    </div>
+                    <span className="text-3xl font-bold text-white">{stat.value}</span>
                   </div>
-                  <span className="text-3xl font-bold text-white">{stat.value}</span>
-                </div>
-                <p className="text-white/70">{stat.label}</p>
-              </motion.div>
+                  <p className="text-white/70">{stat.label}</p>
+                </motion.div>
+              </Link>
             )
           })}
         </motion.div>
@@ -118,6 +125,7 @@ const Dashboard = () => {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.1 }}
                   className="flex items-center gap-4 p-4 bg-white/5 rounded-lg hover:bg-white/10 transition-colors cursor-pointer"
+                  onClick={() => navigate(`/patients/${patient.id}`)}
                 >
                   <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center text-white font-bold">
                     {patient.first_name[0]}{patient.last_name[0]}
@@ -141,22 +149,26 @@ const Dashboard = () => {
 
         {/* Quick Actions */}
         <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <motion.div
-            whileHover={{ scale: 1.02 }}
-            className="glass-card p-6 cursor-pointer hover:bg-white/5 transition-colors"
-          >
-            <HeartPulse className="text-blue-400 mb-4" size={32} />
-            <h3 className="text-xl font-bold text-white mb-2">New Prediction</h3>
-            <p className="text-white/70">Run heart disease risk assessment for a patient</p>
-          </motion.div>
-          <motion.div
-            whileHover={{ scale: 1.02 }}
-            className="glass-card p-6 cursor-pointer hover:bg-white/5 transition-colors"
-          >
-            <Users className="text-green-400 mb-4" size={32} />
-            <h3 className="text-xl font-bold text-white mb-2">Add Patient</h3>
-            <p className="text-white/70">Register a new patient in the system</p>
-          </motion.div>
+          <Link to="/prediction" className="block">
+            <motion.div
+              whileHover={{ scale: 1.02 }}
+              className="glass-card p-6 cursor-pointer hover:bg-white/5 transition-colors h-full"
+            >
+              <HeartPulse className="text-blue-400 mb-4" size={32} />
+              <h3 className="text-xl font-bold text-white mb-2">New Prediction</h3>
+              <p className="text-white/70">Run heart disease risk assessment for a patient</p>
+            </motion.div>
+          </Link>
+          <Link to="/patients" className="block">
+            <motion.div
+              whileHover={{ scale: 1.02 }}
+              className="glass-card p-6 cursor-pointer hover:bg-white/5 transition-colors h-full"
+            >
+              <Users className="text-green-400 mb-4" size={32} />
+              <h3 className="text-xl font-bold text-white mb-2">Add Patient</h3>
+              <p className="text-white/70">Register a new patient in the system</p>
+            </motion.div>
+          </Link>
         </motion.div>
       </motion.div>
     </Layout>
