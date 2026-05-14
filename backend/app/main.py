@@ -5,8 +5,20 @@ from app.core.config import settings
 from app.api.v1 import api_router
 from app.core.database import Base, engine
 
-# Create database tables
-Base.metadata.create_all(bind=engine)
+import time
+from sqlalchemy.exc import OperationalError
+
+# Create database tables with retries
+MAX_RETRIES = 5
+for i in range(MAX_RETRIES):
+    try:
+        Base.metadata.create_all(bind=engine)
+        break
+    except OperationalError as e:
+        if i == MAX_RETRIES - 1:
+            raise e
+        print(f"Database connection failed. Retrying in 5 seconds... ({i+1}/{MAX_RETRIES})")
+        time.sleep(5)
 
 app = FastAPI(
     title="Healthcare Diagnostic API",
