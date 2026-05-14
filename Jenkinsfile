@@ -11,6 +11,7 @@ pipeline {
         FRONTEND_CONTAINER = "healthcare-frontend"
         MYSQL_CONTAINER = "healthcare-mysql"
         NETWORK_NAME = "healthcare-network"
+
         DB_NAME = "healthcare_diagnostic"
         DB_USER = "root"
         DB_PASS = "root123"
@@ -22,34 +23,42 @@ pipeline {
             steps {
                 cleanWs()
                 checkout scm
+
                 sh '''
                     echo "Git Branch: ${GIT_BRANCH}"
                     echo "Git Commit: ${GIT_COMMIT}"
+                    git --version
+                    python3 --version
+                    node --version || true
+                    docker --version
                 '''
             }
         }
 
-stage('Backend Install & Test') {
-    steps {
-        dir('backend') {
-            sh '''
-                rm -rf venv
-                python3 -m venv venv
-                . venv/bin/activate
+        stage('Backend Install & Validation') {
+            steps {
+                dir('backend') {
+                    sh '''
+                        rm -rf venv
+                        python3 -m venv venv
+                        . venv/bin/activate
 
-                pip install --upgrade pip
-                pip install -r requirements.txt
-                pip install pytest
+                        pip install --upgrade pip
+                        pip install -r requirements.txt
+                        pip install pytest
 
-                if find . -type f -name "test_*.py" | grep -q .; then
-                    pytest
-                else
-                    echo "No backend tests found. Skipping pytest."
-                fi
-            '''
+                        TEST_COUNT=$(find . -type f \\( -name "test_*.py" -o -name "*_test.py" \\) | wc -l)
+
+                        if [ "$TEST_COUNT" -gt 0 ]; then
+                            echo "Running backend tests..."
+                            pytest
+                        else
+                            echo "No backend tests found. Skipping pytest."
+                        fi
+                    '''
+                }
+            }
         }
-    }
-}
 
         stage('Frontend Install & Build') {
             steps {
@@ -72,11 +81,11 @@ stage('Backend Install & Test') {
                     python3 ml/train_model.py
 
                     if [ ! -f "ml/models/heart_disease_model.pkl" ]; then
-                        echo "ERROR: ML model file not found"
+                        echo "ML model file missing."
                         exit 1
                     fi
 
-                    echo "ML model trained successfully"
+                    echo "ML training successful."
                 '''
             }
         }
@@ -144,10 +153,18 @@ stage('Backend Install & Test') {
         stage('Wait for MySQL') {
             steps {
                 sh '''
-                    until docker exec ${MYSQL_CONTAINER} mysqladmin ping -h localhost --silent; do
-                        echo "Waiting for MySQL..."
+                    echo "Waiting for MySQL..."
+
+                    for i in {1..20}; do
+                        if docker exec ${MYSQL_CONTAINER} mysqladmin ping -h localhost --silent; then
+                            echo "MySQL ready."
+                            exit 0
+                        fi
                         sleep 5
                     done
+
+                    echo "MySQL startup timeout."
+                    exit 1
                 '''
             }
         }
@@ -193,12 +210,12 @@ Healthcare Diagnostic Platform deployed successfully.
 
 Build Number: #${BUILD_NUMBER}
 
-Backend Image:
+Backend:
 ${DOCKER_HUB_REPO}/${BACKEND_IMAGE}:${IMAGE_TAG}
 
-Frontend Image:
+Frontend:
 ${DOCKER_HUB_REPO}/${FRONTEND_IMAGE}:${IMAGE_TAG}
-""",
+                """,
                 to: "lokesh.j.g13cs@gmail.com"
             )
         }
@@ -207,12 +224,12 @@ ${DOCKER_HUB_REPO}/${FRONTEND_IMAGE}:${IMAGE_TAG}
             emailext(
                 subject: "FAILED: Build #${BUILD_NUMBER}",
                 body: """
-Healthcare Diagnostic Platform pipeline failed.
+Pipeline failed.
 
 Build Number: #${BUILD_NUMBER}
 
 Check Jenkins console logs.
-""",
+                """,
                 to: "lokesh.j.g13cs@gmail.com"
             )
         }
