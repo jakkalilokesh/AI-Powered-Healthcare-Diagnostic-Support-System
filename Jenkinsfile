@@ -29,23 +29,27 @@ pipeline {
             }
         }
 
-        stage('Backend Install & Test') {
-            steps {
-                dir('backend') {
-                    sh '''
-                        rm -rf venv
-                        python3 -m venv venv
-                        . venv/bin/activate
+stage('Backend Install & Test') {
+    steps {
+        dir('backend') {
+            sh '''
+                rm -rf venv
+                python3 -m venv venv
+                . venv/bin/activate
 
-                        pip install --upgrade pip
-                        pip install -r requirements.txt
-                        pip install pytest
+                pip install --upgrade pip
+                pip install -r requirements.txt
+                pip install pytest
 
-                        pytest || exit 1
-                    '''
-                }
-            }
+                if find . -type f -name "test_*.py" | grep -q .; then
+                    pytest
+                else
+                    echo "No backend tests found. Skipping pytest."
+                fi
+            '''
         }
+    }
+}
 
         stage('Frontend Install & Build') {
             steps {
