@@ -137,11 +137,15 @@ pipeline {
         stage('Deploy MySQL') {
             steps {
                 sh '''
+                    docker stop ${FRONTEND_CONTAINER} || true
+                    docker rm ${FRONTEND_CONTAINER} || true
+                    docker stop ${BACKEND_CONTAINER} || true
+                    docker rm ${BACKEND_CONTAINER} || true
                     docker stop ${MYSQL_CONTAINER} || true
                     docker rm ${MYSQL_CONTAINER} || true
                     docker network rm ${NETWORK_NAME} || true
 
-                    docker network create ${NETWORK_NAME}
+                    docker network create ${NETWORK_NAME} || true
 
                     docker run -d \
                       --name ${MYSQL_CONTAINER} \
