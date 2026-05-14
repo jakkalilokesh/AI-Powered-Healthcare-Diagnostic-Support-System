@@ -2,7 +2,7 @@ import api from './api'
 
 export const predictionService = {
   createPrediction: async (predictionData) => {
-    const response = await api.post('/predictions', predictionData)
+    const response = await api.post('/predictions/', predictionData)
     return response.data
   },
 
