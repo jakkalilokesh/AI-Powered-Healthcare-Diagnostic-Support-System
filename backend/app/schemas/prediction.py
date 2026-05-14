@@ -59,7 +59,7 @@ class PredictionResponse(BaseModel):
     risk_level: str
     contributing_factors: Dict[str, float]
     prediction_date: datetime
-    notes: Optional[str]
+    notes: Optional[str] = None
 
 
 class PredictionList(BaseModel):
